@@ -42,7 +42,7 @@ function drawCard() {
   cardDiv.className = 'card';
 
   const cardImg = document.createElement('img');
-  cardImg.src = `images/${cardImages[cardValue - 1]}`;
+  cardImg.src = `${cardImages[cardValue - 1]}`;
   cardImg.alt = `Card ${cardValue}`;
   cardDiv.appendChild(cardImg);
 
