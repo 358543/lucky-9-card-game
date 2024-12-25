@@ -11,8 +11,8 @@ const gameBoard = document.getElementById('game-board');
 const modeSelection = document.getElementById('mode-selection');
 
 const cardImages = [
-  'card1.png', 'card2.png', 'card3.png', 'card4.png', 'card5.png',
-  'card6.png', 'card7.png', 'card8.png', 'card9.png', 'card10.png'
+  'clubs_A.png', 'clubs_2.png', 'clubs_3.png', 'clubs_4.png', 'clubs_5.png',
+  'clubs_6.png', 'clubs_7.png', 'clubs_8.png', 'clubs_9.png', 'clubs_10.png'
 ];
 
 let mode = ''; // "pvp" or "pvc"
