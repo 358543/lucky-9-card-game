@@ -158,3 +158,4 @@ hitBtn.addEventListener('click', hit);
 goodCardBtn.addEventListener('click', goodCard);
 endTurnBtn.addEventListener('click', endTurn);
 resetGameBtn.addEventListener('click', resetGame);
+      
