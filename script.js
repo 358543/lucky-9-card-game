@@ -30,24 +30,25 @@ function startGame(selectedMode) {
 }
 
 function drawCard() {
-  if (players[currentPlayer - 1].cards.length >= 3) {
+  const cardValue = Math.floor(Math.random() * 10) + 1;
+  const currentPlayerData = players[currentPlayer - 1];
+
+  if (currentPlayerData.cards.length >= 3) {
     resultDiv.textContent = `Player ${currentPlayer}, you can only draw up to 3 cards!`;
     return;
   }
 
-  const cardValue = Math.floor(Math.random() * 10) + 1;
-  players[currentPlayer - 1].cards.push(cardValue);
+  currentPlayerData.cards.push(cardValue);
 
   const cardDiv = document.createElement('div');
   cardDiv.className = 'card';
 
   const cardImg = document.createElement('img');
-  cardImg.src = `${cardImages[cardValue - 1]}`;
+  cardImg.src = `images/${cardImages[cardValue - 1]}`;
   cardImg.alt = `Card ${cardValue}`;
   cardDiv.appendChild(cardImg);
 
   playerCardsDiv.appendChild(cardDiv);
-
   calculateScore();
 }
 
@@ -78,11 +79,13 @@ function endTurn() {
 
 function computerTurn() {
   const delay = 1000; // 1 second delay for realism
-  setTimeout(() => {
-    while (players[1].cards.length < 3) {
+  let interval = setInterval(() => {
+    if (players[1].score < 7 && players[1].cards.length < 3) {
       drawCard();
+    } else {
+      clearInterval(interval);
+      determineWinner();
     }
-    determineWinner();
   }, delay);
 }
 
@@ -125,4 +128,4 @@ playerVsComputerBtn.addEventListener('click', () => startGame('pvc'));
 drawCardBtn.addEventListener('click', drawCard);
 endTurnBtn.addEventListener('click', endTurn);
 resetGameBtn.addEventListener('click', resetGame);
-      
+  
