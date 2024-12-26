@@ -1,6 +1,8 @@
 const playerVsPlayerBtn = document.getElementById('player-vs-player');
 const playerVsComputerBtn = document.getElementById('player-vs-computer');
 const drawCardBtn = document.getElementById('draw-card');
+const hitBtn = document.getElementById('hit');
+const goodCardBtn = document.getElementById('good-card');
 const endTurnBtn = document.getElementById('end-turn');
 const resetGameBtn = document.getElementById('reset-game');
 const playerCardsDiv = document.querySelector('#player-cards .cards');
@@ -18,8 +20,8 @@ const cardImages = [
 let mode = ''; // "pvp" or "pvc"
 let currentPlayer = 1;
 let players = [
-  { cards: [], score: 0 },
-  { cards: [], score: 0 }
+  { cards: [], score: 0, hasHit: false },
+  { cards: [], score: 0, hasHit: false }
 ];
 
 function startGame(selectedMode) {
@@ -29,14 +31,25 @@ function startGame(selectedMode) {
   resetGame();
 }
 
+function drawInitialCards() {
+  const currentPlayerData = players[currentPlayer - 1];
+
+  if (currentPlayerData.cards.length > 0) return; // Prevent drawing again
+
+  for (let i = 0; i < 2; i++) {
+    drawCard();
+  }
+
+  drawCardBtn.classList.add('hidden');
+  hitBtn.classList.remove('hidden');
+  goodCardBtn.classList.remove('hidden');
+}
+
 function drawCard() {
   const cardValue = Math.floor(Math.random() * 10) + 1;
   const currentPlayerData = players[currentPlayer - 1];
 
-  if (currentPlayerData.cards.length >= 3) {
-    resultDiv.textContent = `Player ${currentPlayer}, you can only draw up to 3 cards!`;
-    return;
-  }
+  if (currentPlayerData.cards.length >= 3) return; // Max 3 cards
 
   currentPlayerData.cards.push(cardValue);
 
@@ -53,14 +66,30 @@ function drawCard() {
 }
 
 function calculateScore() {
-  players[currentPlayer - 1].score =
-    players[currentPlayer - 1].cards.reduce((sum, card) => sum + card, 0) % 10;
+  const currentPlayerData = players[currentPlayer - 1];
+  currentPlayerData.score = currentPlayerData.cards.reduce((sum, card) => sum + card, 0) % 10;
 
-  playerScoreElement.textContent = `Score: ${players[currentPlayer - 1].score}`;
+  playerScoreElement.textContent = `Score: ${currentPlayerData.score}`;
+}
 
-  if (players[currentPlayer - 1].cards.length === 3) {
-    endTurn();
+function hit() {
+  const currentPlayerData = players[currentPlayer - 1];
+
+  if (currentPlayerData.hasHit) {
+    resultDiv.textContent = `Player ${currentPlayer} has already hit!`;
+    return;
   }
+
+  drawCard();
+  currentPlayerData.hasHit = true;
+
+  hitBtn.classList.add('hidden');
+}
+
+function goodCard() {
+  hitBtn.classList.add('hidden');
+  goodCardBtn.classList.add('hidden');
+  endTurnBtn.classList.remove('hidden');
 }
 
 function endTurn() {
@@ -78,15 +107,10 @@ function endTurn() {
 }
 
 function computerTurn() {
-  const delay = 1000; // 1 second delay for realism
-  let interval = setInterval(() => {
-    if (players[1].score < 7 && players[1].cards.length < 3) {
-      drawCard();
-    } else {
-      clearInterval(interval);
-      determineWinner();
-    }
-  }, delay);
+  while (players[1].cards.length < 3 && players[1].score < 7) {
+    drawCard();
+  }
+  determineWinner();
 }
 
 function determineWinner() {
@@ -100,22 +124,26 @@ function determineWinner() {
   } else {
     resultDiv.textContent = mode === 'pvp' ? 'Player 2 Wins!' : 'Computer Wins!';
   }
+
   drawCardBtn.disabled = true;
-  endTurnBtn.disabled = true;
+  hitBtn.disabled = true;
+  goodCardBtn.disabled = true;
 }
 
 function resetGame() {
   players = [
-    { cards: [], score: 0 },
-    { cards: [], score: 0 }
+    { cards: [], score: 0, hasHit: false },
+    { cards: [], score: 0, hasHit: false }
   ];
   currentPlayer = 1;
   currentPlayerElement.textContent = 'Current Turn: Player 1';
   playerCardsDiv.innerHTML = '';
   playerScoreElement.textContent = 'Score: 0';
   resultDiv.textContent = '';
-  drawCardBtn.disabled = false;
-  endTurnBtn.disabled = false;
+  drawCardBtn.classList.remove('hidden');
+  hitBtn.classList.add('hidden');
+  goodCardBtn.classList.add('hidden');
+  endTurnBtn.classList.add('hidden');
 }
 
 function updateUIForNewTurn() {
@@ -125,7 +153,8 @@ function updateUIForNewTurn() {
 
 playerVsPlayerBtn.addEventListener('click', () => startGame('pvp'));
 playerVsComputerBtn.addEventListener('click', () => startGame('pvc'));
-drawCardBtn.addEventListener('click', drawCard);
+drawCardBtn.addEventListener('click', drawInitialCards);
+hitBtn.addEventListener('click', hit);
+goodCardBtn.addEventListener('click', goodCard);
 endTurnBtn.addEventListener('click', endTurn);
 resetGameBtn.addEventListener('click', resetGame);
-  
